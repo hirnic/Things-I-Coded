@@ -1,0 +1,284 @@
+<html>
+<head>
+<body>
+<p>
+This calculator computes the dimensions of a particular class of pyramids. Namely, this class contains all pyramids whose base is a regular polygon and whose apex lies directly above the centroid of the base ("directly above", meaning colinear with the centroid along the vector normal to the base.)
+</p>
+<p>
+This calculator requires the user to specify the number of sides of the base and exactly two other quantities. The placeholder letters inside the text boxes indicate which variables are used by the calculator to compute the values: H means Height of the pyramid and L means Length of a side of the base. It is critical that each letter (H and L) appears next to at least one of the two quantities specified by the user and that at most one quantity is an angle. Otherwise, such a pyramid may not exist, or infinitely many such pyramids may exist (or perhaps neither.) Make sure the number pairs are sensible- a base area of 2 and a total area of 1 is not sensible.
+</p>		
+<p>
+Version 0.3 Notes: Cleaned up the look of the calculator. Caught an error in the formula for face area, thanks to Charlie Ziese. Reduced the calculator to just 2 buttons: Clear and Calculate. The calculate button is essentially the same as the "Hard Calculate" button from previous versions. As usual, beware of bugs. This has been behaving nicely... so far.
+</p>
+
+<form name="parameters">
+<p>Number of Sides of Base: <input type="text" id="enn" value="" placeholder="n"> </p>
+
+<table style="float:left">
+<th> Angles (degrees) </th>
+ <tr>
+  <td align="right"> Base Angle: </td>
+  <td align="left"> <input type="text" name="baseAngle" id="q1" value="" placeholder="n"></td>
+ </tr>
+ <tr>
+  <td align="right"> Slant Angle: </td>
+  <td align="left"> <input type="text" name="slantAngle" id="q2" value="" placeholder="H,L"></td>
+ </tr>
+ <tr>
+  <td align="right"> Base Angle of Face: </td>
+  <td align="left"> <input type="text" name="baseAngleOfFace" id="q3" value="" placeholder="H,L"> </td>
+ </tr>
+ <tr>
+  <td align="right"> Vertex Angle: </td>
+  <td align="left"> <input type="text" name="vertexAngle" id="q4" value="" placeholder="H,L"> </td>
+ </tr>
+ <tr>
+  <td align="right"> Edge Angle: </td>
+  <td align="left"> <input type="text" name="edgeAngle" id="q5" value="" placeholder="H,L"> </td>
+ </tr>
+ <tr>
+  <td align="right"> Face Angle: </td>
+  <td align="left"> <input type="text" name="faceAngle" id="q6" value="" placeholder="H,L"> </td>
+ </tr>
+ <tr>
+  <td align="right"> Apex Angle: </td>
+  <td align="left"> <input type="text" name="apexAngle" id="q25" value="" placeholder="H,L"> </td>
+ </tr>
+</table>
+
+<table style="float:left">
+<th>Lengths<th>
+ <tr>
+  <td align="right"> Base Side Length: </td>
+  <td align="left"> <input type="text" name="baseLength" id="q7" value="" placeholder="L"> </td>
+ </tr>
+ <tr>
+  <td align="right"> Pyramid Height: </td>
+  <td align="left"> <input type="text" name="pyramidHeight" id="q8" value="" placeholder="H"> </td>
+ </tr>
+ <tr>
+  <td align="right"> Apothem: </td>
+  <td align="left"> <input type="text" name="apothem" id="q9" value="" placeholder="L"> </td>
+ </tr>
+ <tr>
+  <td align="right"> Circumradius: </td>
+  <td align="left"> <input type="text" name="circumradius" id="q10" value="" placeholder="L"> </td>
+ </tr>
+ <tr>
+  <td align="right"> Slant Height: </td>
+  <td align="left"> <input type="text" name="slantHeight" id="q11" value="" placeholder="H,L"> </td>
+ </tr>
+ <tr>
+  <td align="right"> Edge Height: </td>
+  <td align="left"> <input type="text" name="edgeHeight" id="q12" value="" placeholder="H,L"> </td>
+ </tr>
+ <tr>
+  <td align="right"> Base Perimeter: </td>
+  <td align="left"> <input type="text" name="basePerimeter" id="q13" value="" placeholder="L"> </td>
+ </tr>
+ <tr>
+  <td align="right"> Face Perimeter: </td>
+  <td align="left"> <input type="text" name="facePerimeter" id="q14" value="" placeholder="H,L"> </td>
+ </tr>
+ <tr>
+  <td align="right"> Insphere Radius: </td>
+  <td align="left"> <input type="text" name="insphereRadius" id="q15" value="" placeholder="H,L"> </td>
+ </tr>
+ <tr>
+  <td align="right"> Circumsphere Radius: </td>
+  <td align="left"> <input type="text" name="circumsphereRadius" id="q16" value="" placeholder="H,L"> </td>
+ </tr>
+</table>
+
+<table style="float:left">
+<th> Areas </th>
+ <tr>
+  <td align="right"> Base Area: </td>
+  <td align="left"> <input type="text" name="baseArea" id="q17" value="" placeholder="L"> </td>
+ </tr>
+ <tr>
+  <td align="right"> Face Area: </td>
+  <td align="left"> <input type="text" name="faceArea" id="q18" value="" placeholder="H,L"> </td>
+ </tr>
+ <tr>
+  <td align="right"> Surface Area: </td>
+  <td align="left"> <input type="text" name="surfaceArea" id="q19" value="" placeholder="H,L"> </td>
+ </tr>
+ <tr>
+  <td align="right"> Insphere Surface Area: </td>
+  <td align="left"> <input type="text" name="insphereSA" id="q20" value="" placeholder="H,L"></td>
+ </tr>
+ <tr>
+  <td align="right"> Circumsphere Surface Area: </td>
+  <td align="left"> <input type="text" name="circumsphereSA" id="q21" value="" placeholder="H,L"> </td>
+ </tr>
+</table>
+
+<table style="float:left">
+<th> Volumes </th>
+ <tr>
+  <td align="right"> Pyramid Volume: </td>
+  <td align="left"> <input type="text" name="pyramidVolume" id="q22" value="" placeholder="H,L"> </td>
+ </tr>
+ <tr>
+  <td align="right"> Insphere Volume: </td>
+  <td align="left"> <input type="text" name="insphereVolume" id="q23" value="" placeholder="H,L"> </td>
+ </tr>
+ <tr>
+  <td align="right"> Circumsphere Volume: </td>
+  <td align="left"> <input type="text" name="circumsphereVolume" id="q24" value="" placeholder="H,L"> </td>
+ </tr>
+</table>
+
+<input type="button" name="button3" id=clear value="Clear Entries" onClick="clearAll()">
+<input type="button" name="button4" id=B3 value="Calculate" onClick="hardCalculate()">
+</form>
+
+<p id="messages"> </p>
+
+</body>
+
+
+
+<script>
+
+const Ell = [1,2,3,4,5,6,7,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25];
+const Aytch = [2,3,4,5,6,8,11,12,14,15,16,18,19,20,21,22,23,24,25];
+
+
+function clearAll()
+{
+var m=1;
+while(m<26)
+ {
+  document.getElementById('q'+m).value="";
+  m+=1;
+ }
+}
+
+function ess(x,y,z){return Math.sqrt(4*(x**2)/(y**2)+(Math.tan(z))**2);}
+function arr(x,y,z){return Math.sqrt(4*(x**2)/(y**2)+1/(Math.cos(z))**2);}
+
+function qyoo(x,y,z)
+{
+ return [0,
+ 2*180/Math.PI*z,
+ (180/Math.PI)*Math.atan(2*x/(y*Math.tan(z))),
+ (180/Math.PI)*Math.atan(ess(x,y,z)),
+ 180 - 2*(180/Math.PI)*Math.atan(ess(x,y,z)),
+ (180/Math.PI)*Math.atan(2*x/y*Math.cos(z)),
+ (180/Math.PI)*2*Math.asin(Math.sin(z)*arr(x,y,z)/ess(x,y,z)),
+
+ y,
+ x,
+
+ 1/2*y*Math.tan(z),
+ 1/2*y/Math.cos(z),
+ 1/2*y*ess(x,y,z),
+ 1/2*y*arr(x,y,z),
+ document.parameters.enn.value*y,
+ y*(1+arr(x,y,z)),
+ x/(1+1/(Math.cos(Math.atan(2*x/(y*Math.tan(z)))))),
+ 1/(2*x)*((1/2*y/(Math.cos(z)))**2+x**2),
+
+ 1/4*document.parameters.enn.value*(y**2)*Math.tan(z),
+ 1/4*y*y*ess(x,y,z),
+ 1/4*document.parameters.enn.value*(y**2)*(Math.tan(z)+ess(x,y,z)),
+ 4*Math.PI*(x/(1+1/(Math.cos(Math.atan(2*x/(y*Math.tan(z)))))))**2,
+ 4*Math.PI*(1/(2*x)*((1/2*y/(Math.cos(z)))**2+x**2))**2,
+
+ 1/12*document.parameters.enn.value*x*(y**2)*Math.tan(z),
+ 4/3*Math.PI*(x/(1+1/(Math.cos(Math.atan(2*x/(y*Math.tan(z)))))))**3,
+ 4/3*Math.PI*(1/(2*x)*((1/2*y/(Math.cos(z)))**2+x**2))**3,
+ 180/Math.PI*(Math.PI-2*Math.atan(2*x/(y*Math.tan(z))))];}
+
+function EZCalculate()
+{
+ var n = document.parameters.enn.value;
+ var T = (Math.PI/2)*(n-2)/n;
+ var H = document.parameters.pyramidHeight.value;
+ var L = document.parameters.baseLength.value;
+ var S = Math.sqrt(4*(H**2)/(L**2)+(Math.tan(T))**2);
+ var R = Math.sqrt(4*(H**2)/(L**2)+1/(Math.cos(T))**2);
+ c=1
+ while(c<26){var number=qyoo(H,L,T)[c]; document.getElementById('q'+c).value= Math.round(number*Math.pow(10,10))/Math.pow(10,10); c+=1}
+}
+
+
+
+
+function countFields()
+{
+ var n = 1;
+ const filled = [0,0,0];
+ while(n<26)
+ {
+  if(document.getElementById('q'+n).value !="")
+   {
+    filled[0] += 1;
+    filled.push(n);
+    if(Ell.includes(n)){filled[1] += 1};
+    if(Aytch.includes(n)){filled[2] += 1};
+   };
+  n+=1;
+ }
+return filled;
+}
+
+
+
+function fewMany()
+{
+ if(countFields()[0] != 2){document.getElementById("messages").innerHTML = "Too few/many quantities specified."; return 1;}
+ else if (countFields()[1]*countFields()[2] <1){document.getElementById("messages").innerHTML = "Deficient specifications."; return 1;}
+ else if (countFields()[0] == 2){document.getElementById("messages").innerHTML = ""; return 0};
+}
+
+
+
+function hardCalculate()
+{ 
+ if(fewMany()==1){return;}
+ var n = document.parameters.enn.value;
+ var T = (Math.PI/2)*(n-2)/n;
+ var nOne = countFields()[3];
+ var nTwo = countFields()[4];
+
+ var valOne = document.getElementById('q'+nOne).value;
+  
+ var valTwo = document.getElementById('q'+nTwo).value;
+
+ var Length=1;
+ var Height=1;
+
+ c=1
+ while(c < 26)
+ {
+  var f1 = qyoo(Height,Length,T)[nOne]-valOne;
+  var f2 = qyoo(Height,Length,T)[nTwo]-valTwo;
+  var f1x1 = (2**(20))*(qyoo(Height+2**(-20),Length,T)[nOne]-qyoo(Height,Length,T)[nOne]);
+  var f1x2 = (2**(20))*(qyoo(Height,Length+2**(-20),T)[nOne]-qyoo(Height,Length,T)[nOne]);
+  var f2x1 = (2**(20))*(qyoo(Height+2**(-20),Length,T)[nTwo]-qyoo(Height,Length,T)[nTwo]);
+  var f2x2 = (2**(20))*(qyoo(Height,Length+2**(-20),T)[nTwo]-qyoo(Height,Length,T)[nTwo]);
+  var det = 1/(f1x1*f2x2-f2x1*f1x2);
+  var fT = f1*f2x2-f2*f1x2;
+  var fB = f2*f1x1-f1*f2x1;
+
+  Height = Height - fT*det;
+  Length = Length - fB*det;
+
+  c+=1;
+ }
+ 
+
+ document.getElementById('q7').value = Length;
+ document.getElementById('q8').value = Height;
+ EZCalculate();
+
+}
+
+</script>
+
+
+
+</html>
