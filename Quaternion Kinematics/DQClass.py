@@ -84,11 +84,22 @@ class Quaternion:
         Im = Q.ImaginaryPart().normalization()
         return Quaternion(math.log(N), 0, 0, 0) + Quaternion(math.atan2(N, Re), 0, 0, 0) * Im
 
+    def ToFullVec(self):
+        return [self.w, self.x, self.y, self.z]
+
+    def ToPureVec(self):
+        return [self.x, self.y, self.z]
+
+    def PoseIt(self, other):  # Other must be a pose.
+        return other.Q * self * other.Q.conjugate()  + other.T
+
+    def Rotate(self, other): # Self is the vector being rotated, other is the rotation quaternion
+        return other * self * other.conjugate()
+
 
 # Example usage
 q1 = Quaternion(0, 2*math.pi, 0, 0)
 q2 = Quaternion(-3, -9, -15, -21)
-
 # print("q1:", q1)
 # print("q2:", q2)
 # print("Sum:", q1 + q2)
@@ -213,6 +224,73 @@ class DQuaternion:
         except ZeroDivisionError:
             print("Cannot invert zero divisors!")
 
+    def ToFullVec(self):
+        return [self.A.w, self.A.x, self.A.y, self.A.z, self.B.w, self.B.x, self.B.y, self.B.z]
+
+    def To6Vec(self):
+        return [self.A.x, self.A.y, self.A.z, self.B.x, self.B.y, self.B.z]
+
+    def size(self):
+        return math.sqrt(self.A.norm()**2 + self.B.norm()**2)
+
+
+def IdentityQ():
+    return Quaternion(1, 0, 0, 0)
+
+
+def IdentityDQ():
+    return DQuaternion(Quaternion(1, 0, 0, 0), Quaternion(0, 0, 0, 0))
+
+
+def ZeroDQ():
+    return DQuaternion(Quaternion(0, 0, 0, 0), Quaternion(0, 0, 0, 0))
+
+def ToVectorQuaternion(x):  # x must be a 3-vector
+    if len(x) != 3:
+        print("You cannot turn this vector into a rotation quaternion. The input must be a 1D array of length 3.")
+    else:
+        return Quaternion(0, x[0], x[1], x[2])
+
+def ToQuaternionRotation(x):  # x must be a 3-vector of norm < 1
+    if len(x) != 3:
+        print("You cannot turn this vector into a rotation quaternion. The input must be a 1D array of length 3.")
+        return
+    if x[0]**2 + x[1]**2 + x[2]**2 > 1:
+        print("Rotation vectors must have norm less than or equal to 1!")
+        return
+    else:
+        S = Quaternion(0, x[0], x[1], x[2])
+        try:
+            C = math.sqrt(1 - S.x**2 - S.y**2 - S.z**2)
+        except:
+            C = 0
+        return Quaternion(C, 0, 0, 0) + S
+
+def ToQuaternionTranslation(x):  # x must be a 3-vector
+    if len(x) != 3:
+        print("You cannot turn this vector into a translation quaternion. The input must be a 1D array of length 3.")
+    else:
+        return Quaternion(0, x[0], x[1], x[2])
+
+
+def ToVectorDualQuaternion(x):
+    if len(x) != 6:
+        print("You cannot turn this vector into a unit dual quaternion. Input must be a 1D array of length 6.")
+    else:
+        Q = ToVectorQuaternion(x[:3])
+        t = ToQuaternionTranslation(x[3:])
+        return DQuaternion(Q, t)
+
+
+def ToPoseDualQuaternion(x):
+    if len(x) != 6:
+        print("You cannot turn this vector into a unit dual quaternion. Input must be a 1D array of length 6.")
+    else:
+        Q = ToQuaternionRotation(x[:3])
+        t = ToQuaternionTranslation(x[3:])
+        B = t * Q * (1 / 2)
+        return DQuaternion(Q, B)
+
 
 d1 = DQuaternion(Quaternion(0, 0, 0, 1), Quaternion(2, 0, 0, 0))
 d2 = DQuaternion(Quaternion(7, 3.14, 9, 10), Quaternion(2, 2, 2.1, 1.3))
@@ -232,3 +310,17 @@ d2 = DQuaternion(Quaternion(7, 3.14, 9, 10), Quaternion(2, 2, 2.1, 1.3))
 # print("Exponential of d1:", d1.Exponential())
 # print("Logarithm of d1:", d1.Logarithm())
 # print("SLERP(d1, d2, .5):", d1.slerp(d2, 0.5))
+
+
+class Pose:
+    def __init__(self, Q, T):
+        self.Q = Q
+        self.T = T
+
+    def __repr__(self):
+        return f"Pose({self.Q}, {self.T})"
+
+def ToPose(x):
+    Q = ToQuaternionRotation(x[:3])
+    T = ToQuaternionTranslation(x[3:])
+    return Pose(Q,T)
