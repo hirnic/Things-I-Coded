@@ -1,7 +1,6 @@
 import random
 import tkinter as tk
 import math
-import time
 
 # The most important part of the game!
 score = 0
