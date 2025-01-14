@@ -6,6 +6,8 @@ import math
 score = 0
 # This is the grid of numerical values. For each index x in Grid, use (x//4,x%4) to find the coordinates.
 Grid = [0 for i in range(16)]
+# This determines if you have already won the game or not
+Won = False
 
 # This generates a random square.
 def generate_square(grid):
@@ -18,19 +20,6 @@ def generate_square(grid):
         x = 4
     new_grid[index] = x
     return new_grid
-
-# This tests the loss condition
-def loss_condition(grid):
-    global score
-    old_score = score
-    if 0 in grid:
-        return False
-    elif (grid == grid_slide(grid, 'Left') and grid == grid_slide(grid, 'Right')
-          and grid == grid_slide(grid, 'Up') and grid == grid_slide(grid, 'Down')):
-        return True
-    else:
-        score = old_score
-        return False
 
 # Initialize the window
 root = tk.Tk()
@@ -68,29 +57,13 @@ def draw_rectangle(x1, y1, x2, y2, color):
     canvas.create_rectangle(x1, y1, x2, y2, outline=color, fill=color)
 
 # This makes the black screen
-def make_blackground():
-    draw_rectangle(0, 50, 400, 450, 'black')
-
-# This makes the grid lines
-def make_gridlines():
-    # Vertical gridlines
-    draw_line(100, 50, 100, 450, 'gray')
-    draw_line(200, 50, 200, 450, 'gray')
-    draw_line(300, 50, 300, 450, 'gray')
-    # Horizontal gridlines
-    draw_line(0, 150, 400, 150, 'gray')
-    draw_line(0, 250, 400, 250, 'gray')
-    draw_line(0, 350, 400, 350, 'gray')
-
-# Makes the black background with grey gridlines
 def make_background():
-    make_blackground()
-    make_gridlines()
+    draw_rectangle(0, 50, 400, 450, 'black')
 
 # This is the list of colors of the numerical values of the squares
 def colorizer(n):
     colors = ['maroon', 'purple', 'yellow', 'cyan', 'red2', 'blue2',
-              'light coral', 'dark green', 'green yellow', 'honeydew2', 'navy', 'orange']
+              'light coral', 'dark green', 'green yellow', 'honeydew2', 'dodger blue', 'orange', 'white']
     return colors[n]
 
 # This updates the score
@@ -106,12 +79,26 @@ def make_brick(n):
         x2 = 99 + (n % 4) * 100
         y2 = 149 + (n // 4) * 100
         draw_rectangle(x1, y1, x2, y2, color)
-        canvas.create_text((x1 + x2) / 2, (y1 + y2) / 2, text=Grid[n], font=("Arial", 40), fill="black")
+        canvas.create_text((x1 + x2) / 2, (y1 + y2) / 2, text=Grid[n], font=("Arial", 32), fill="black")
 
 # Populates the grid with the squares from Grid
 def populate():
     for n in range(16):
         make_brick(n)
+
+# This tests the loss condition
+def loss_condition(grid):
+    global score
+    old_score = score
+    if 0 in grid:
+        return False
+    elif (grid == grid_slide(grid, 'Left') and grid == grid_slide(grid, 'Right')
+          and grid == grid_slide(grid, 'Up') and grid == grid_slide(grid, 'Down')):
+        return True
+    else:
+        score = old_score
+        populate()
+        return False
 
 # This is the loss screen
 def lose_screen():
@@ -120,165 +107,137 @@ def lose_screen():
     button1.config(state=tk.NORMAL)
     button2.config(state=tk.NORMAL)
 
+# This pops up when you win
+def win_screen():
+    root.unbind("<Left>")
+    root.unbind("<Right>")
+    root.unbind("<Up>")
+    root.unbind("<Down>")
+    draw_rectangle(100, 100, 300, 350, 'white')
+    canvas.create_text(200, 175, width=200, anchor="center", text="You Won!", font=("Courier New", 40), fill="black")
+    button3.place(x=150, y= 250)
+    root.unbind("<Left>")
+    root.unbind("<Right>")
+    root.unbind("<Up>")
+    root.unbind("<Down>")
+
+# This gives the option to continue playing after winning
+def continue_game():
+    global Won
+    Won = True
+    canvas.delete("all")
+    update_score()
+    make_background()
+    populate()
+    root.bind("<Left>", key_slide)
+    root.bind("<Right>", key_slide)
+    root.bind("<Up>", key_slide)
+    root.bind("<Down>", key_slide)
+    button3.place_forget()
+
 # This function animates a block moving from initial position in the specified direction by one block
 def slide_animation(grid, drxn, init):
     x1 = 1 + (init % 4) * 100
     y1 = 51 + (init // 4) * 100
     x2 = 99 + (init % 4) * 100
     y2 = 149 + (init // 4) * 100
+    gEntry, xAddMe, yAddMe = 0, 0, 0
     if drxn == 'Left':
-        color = colorizer(int(math.log2(grid[init - 1]) - 1))
+        gEntry = init - 1
+        xAddMe = -50
+    elif drxn == 'Right':
+        gEntry = init + 1
+        xAddMe = 50
+    elif drxn == 'Up':
+        gEntry = init - 4
+        yAddMe = -50
+    elif drxn == 'Down':
+        gEntry = init + 4
+        yAddMe = 50
+    for i in range(2):
+        color = colorizer(int(math.log2(grid[gEntry]) - 1))
         draw_rectangle(x1, y1, x2, y2, 'black')
-        x1 = x1 - 100
-        x2 = x2 - 100
+        x1 += xAddMe
+        x2 += xAddMe
+        y1 += yAddMe
+        y2 += yAddMe
         draw_rectangle(x1, y1, x2, y2, color)
-        canvas.create_text((x1 + x2) / 2, (y1 + y2) / 2, text=grid[init - 1], font=("Arial", 40), fill="black")
+        canvas.create_text((x1 + x2) / 2, (y1 + y2) / 2, text=grid[gEntry], font=("Arial", 32), fill="black")
         canvas.update()
-    if drxn == 'Right':
-        color = colorizer(int(math.log2(grid[init + 1]) - 1))
-        draw_rectangle(x1, y1, x2, y2, 'black')
-        x1 = x1 + 100
-        x2 = x2 + 100
-        draw_rectangle(x1, y1, x2, y2, color)
-        canvas.create_text((x1 + x2) / 2, (y1 + y2) / 2, text=grid[init + 1], font=("Arial", 40), fill="black")
-        canvas.update()
-    if drxn == 'Up':
-        color = colorizer(int(math.log2(grid[init - 4]) - 1))
-        draw_rectangle(x1, y1, x2, y2, 'black')
-        y1 = y1 - 100
-        y2 = y2 - 100
-        draw_rectangle(x1, y1, x2, y2, color)
-        canvas.create_text((x1 + x2) / 2, (y1 + y2) / 2, text=grid[init - 4], font=("Arial", 40), fill="black")
-        canvas.update()
-    if drxn == 'Down':
-        color = colorizer(int(math.log2(grid[init + 4]) - 1))
-        draw_rectangle(x1, y1, x2, y2, 'black')
-        y1 = y1 + 100
-        y2 = y2 + 100
-        draw_rectangle(x1, y1, x2, y2, color)
-        canvas.create_text((x1 + x2) / 2, (y1 + y2) / 2, text=grid[init + 4], font=("Arial", 40), fill="black")
-        canvas.update()
+        canvas.after(1)
 
 # This function animates a block moving from initial position in the specified direction by one block
 def collision_animation(drxn, init):
-    color1, color2 = 'black', 'black'
+    colors = ['black', 'black']
     if Grid[init] != 0:
-        color1 = colorizer(int(math.log2(Grid[init]) - 1))
-        color2 = colorizer(int(math.log2(Grid[init])))
+        colors[0] = colorizer(int(math.log2(Grid[init]) - 1))
+        colors[1] = colorizer(int(math.log2(Grid[init])))
     x1 = 1 + (init % 4) * 100
     y1 = 51 + (init // 4) * 100
     x2 = 99 + (init % 4) * 100
     y2 = 149 + (init // 4) * 100
+    xAddMe, yAddMe = 0, 0
     if drxn == 'Left':
-        draw_rectangle(x1, y1, x2, y2, 'black')
-        x1 = x1 - 50
-        x2 = x2 - 50
-        draw_rectangle(x1, y1, x2, y2, color1)
-        canvas.create_text((x1 + x2) / 2, (y1 + y2) / 2, text=Grid[init], font=("Arial", 40), fill="black")
-        canvas.update()
-        draw_rectangle(x1, y1, x2, y2, 'black')
-        x1 = x1 - 50
-        x2 = x2 - 50
-        draw_rectangle(x1, y1, x2, y2, color2)
-        canvas.create_text((x1 + x2) / 2, (y1 + y2) / 2, text=2*Grid[init], font=("Arial", 40), fill="black")
-        canvas.update()
+        xAddMe = -33
     if drxn == 'Right':
-        draw_rectangle(x1, y1, x2, y2, 'black')
-        x1 = x1 + 50
-        x2 = x2 + 50
-        draw_rectangle(x1, y1, x2, y2, color1)
-        canvas.create_text((x1 + x2) / 2, (y1 + y2) / 2, text=Grid[init], font=("Arial", 40), fill="black")
-        canvas.update()
-        draw_rectangle(x1, y1, x2, y2, 'black')
-        x1 = x1 + 50
-        x2 = x2 + 50
-        draw_rectangle(x1, y1, x2, y2, color2)
-        canvas.create_text((x1 + x2) / 2, (y1 + y2) / 2, text=2*Grid[init], font=("Arial", 40), fill="black")
-        canvas.update()
+        xAddMe = 33
     if drxn == 'Up':
-        draw_rectangle(x1, y1, x2, y2, 'black')
-        y1 = y1 - 50
-        y2 = y2 - 50
-        draw_rectangle(x1, y1, x2, y2, color1)
-        canvas.create_text((x1 + x2) / 2, (y1 + y2) / 2, text=Grid[init], font=("Arial", 40), fill="black")
-        canvas.update()
-        draw_rectangle(x1, y1, x2, y2, 'black')
-        y1 = y1 - 50
-        y2 = y2 - 50
-        draw_rectangle(x1, y1, x2, y2, color2)
-        canvas.create_text((x1 + x2) / 2, (y1 + y2) / 2, text=2*Grid[init], font=("Arial", 40), fill="black")
-        canvas.update()
+        yAddMe = -33
     if drxn == 'Down':
+        yAddMe = 33
+    text = Grid[init]
+    for i in range(2):
         draw_rectangle(x1, y1, x2, y2, 'black')
-        y1 = y1 + 50
-        y2 = y2 + 50
-        draw_rectangle(x1, y1, x2, y2, color1)
-        canvas.create_text((x1 + x2) / 2, (y1 + y2) / 2, text=Grid[init], font=("Arial", 40), fill="black")
+        x1 = x1 + xAddMe
+        x2 = x2 + xAddMe
+        y1 = y1 + yAddMe
+        y2 = y2 + yAddMe
+        draw_rectangle(x1, y1, x2, y2, colors[i])
+        canvas.create_text((x1 + x2) / 2, (y1 + y2) / 2, text=Grid[init], font=("Arial", 32), fill="black")
         canvas.update()
-        draw_rectangle(x1, y1, x2, y2, 'black')
-        y1 = y1 + 50
-        y2 = y2 + 50
-        draw_rectangle(x1, y1, x2, y2, color2)
-        canvas.create_text((x1 + x2) / 2, (y1 + y2) / 2, text=2*Grid[init], font=("Arial", 40), fill="black")
-        canvas.update()
+        text *= 2
 
 # Slides the grid in the specified direction
 def grid_slide(grid, drxn):
     new_grid = grid.copy()
     global score
-    for number in range(4):
-        for k in range(3):
-            if drxn == 'Left':
-                for i in range(3):
-                    if new_grid[4*number + i] == 0:
-                        new_grid[4*number + i], new_grid[4*number + i + 1] = new_grid[4*number + i + 1], 0
-                        if new_grid[4*number + i] != 0:
-                            slide_animation(new_grid, drxn, 4 * number + i + 1)
-                    elif new_grid[4*number + i] == new_grid[4*number + i + 1]:
-                        new_grid[4*number + i], new_grid[4*number + i + 1] = 2 * new_grid[4 * number + i], 0
-                        score += new_grid[4*number + i]
-                        collision_animation(drxn, 4*number + i+1)
-            elif drxn == 'Right':
-                for i in range(3, 0, -1):
-                    if new_grid[4 * number + i] == 0:
-                        new_grid[4 * number + i], new_grid[4 * number + i - 1] = new_grid[4 * number + i - 1], 0
-                        if new_grid[4*number + i] != 0:
-                            slide_animation(new_grid, drxn, 4 * number + i-1)
-                    elif new_grid[4 * number + i] == new_grid[4 * number + i - 1]:
-                        new_grid[4 * number + i], new_grid[4 * number + i - 1] = 2 * new_grid[4 * number + i], 0
-                        score += new_grid[4 * number + i]
-                        collision_animation(drxn, 4 * number + i - 1)
-            elif drxn == 'Up':
-                for i in range(3):
-                    if new_grid[number + 4 * i] == 0:
-                        new_grid[number + 4 * i], new_grid[number + 4 * (i + 1)] = new_grid[number + 4 * (i + 1)], 0
-                        if new_grid[number + 4*i] != 0:
-                            slide_animation(new_grid, drxn,  number + 4 *(i + 1))
-                    elif new_grid[number + 4 * i] == new_grid[number + 4 * (i + 1)]:
-                        new_grid[number + 4 * i], new_grid[number + 4 * (i + 1)] = 2 * new_grid[number + 4 * i], 0
-                        collision_animation(drxn, number + 4 *(i + 1))
-                        score += new_grid[number + 4 * i]
-            elif drxn == 'Down':
-                for i in range(3, 0, -1):
-                    if new_grid[number + 4 * i] == 0:
-                        new_grid[number + 4 * i], new_grid[number + 4 * (i - 1)] = new_grid[number + 4 * (i - 1)], 0
-                        if new_grid[number + 4 * i] != 0:
-                            slide_animation(new_grid, drxn,  number + 4 *(i - 1))
-                    elif new_grid[number + 4 * i] == new_grid[number + 4 * (i - 1)]:
-                        new_grid[number + 4 * i], new_grid[number + 4 * (i - 1)] = 2 * new_grid[number + 4 * i], 0
-                        collision_animation(drxn, number + 4 * (i - 1))
-                        score += new_grid[number + 4 * i]
+    current, previous = 0, 0
+    for number in range(4):  # Row number or column number
+         for k in range(3):   # Iterating three times ensures the sliding process is complete.
+            for i in range(3):
+                if drxn == 'Left':
+                    current = 4 * number + i
+                    previous = 4 * number + i + 1
+                elif drxn == 'Right':
+                    current = 4 * number + 3 - i
+                    previous = 4 * number + 2 - i
+                elif drxn == 'Up':
+                    current = number + 4 * i
+                    previous = number + 4 * (i + 1)
+                elif drxn == 'Down':
+                    current = number + 4 * (3 - i)
+                    previous = number + 4 * (2 - i)
+                if new_grid[current] == 0:
+                    new_grid[current], new_grid[previous] = new_grid[previous], 0
+                    if new_grid[current] != 0:
+                        slide_animation(new_grid, drxn, previous)
+                elif new_grid[current] == new_grid[previous]:
+                    new_grid[current], new_grid[previous] = 2 * new_grid[previous], 0
+                    score += new_grid[current]
+                    collision_animation(drxn, previous)
     if new_grid != grid:
         new_grid = generate_square(new_grid)
     return new_grid
 
 # This is what the arrow keys activate
 def key_slide(event):
+    global Grid
+    global Won
     root.unbind("<Left>")
     root.unbind("<Right>")
     root.unbind("<Up>")
     root.unbind("<Down>")
-    global Grid
+
     # old_grid = Grid.copy()
     Grid = grid_slide(Grid, event.keysym)
     #
@@ -292,6 +251,8 @@ def key_slide(event):
     root.bind("<Down>", key_slide)
     if loss_condition(Grid):
         lose_screen()
+    if 2048 in Grid and not Won:
+        win_screen()
 
 # This starts a new game
 def new_game():
@@ -332,6 +293,9 @@ button1 = tk.Button(root, text="New Game", command=new_game)
 button1.place(x=1, y=25)
 button2 = tk.Button(root, text="Quit", command=Quit, state=tk.DISABLED)
 button2.place(x=350, y=25)
+button3 = tk.Button(root, text="Continue Game", command=continue_game)
+button3.place(x=200, y= 250)
+button3.place_forget()
 
 # Run the main event loop
 main_menu()
