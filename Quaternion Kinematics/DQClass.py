@@ -291,6 +291,12 @@ def ToPoseDualQuaternion(x):
         B = t * Q * (1 / 2)
         return DQuaternion(Q, B)
 
+def ToDualQuaternion(x):
+    if len(x) != 8:
+        print("You cannot turn this vector into a dual quaternion. Imput must be a 1D array of length 8.")
+    else:
+        return DQuaternion(Quaternion(x[0], x[1], x[2], x[3]), Quaternion(x[4], x[5], x[6], x[7]))
+
 
 d1 = DQuaternion(Quaternion(0, 0, 0, 1), Quaternion(2, 0, 0, 0))
 d2 = DQuaternion(Quaternion(7, 3.14, 9, 10), Quaternion(2, 2, 2.1, 1.3))
